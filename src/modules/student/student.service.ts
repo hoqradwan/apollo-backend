@@ -1,19 +1,29 @@
-import { Student } from './student.interface';
-import { StudentModel } from './student.model';
-const createStudentIntoDB = async (student: Student) => {
-  const result = await StudentModel.create(student);
-  return result;
-};
+import { Student } from './student.model';
+
 const getAllStudentsFromDb = async () => {
-  const result = await StudentModel.find();
+  const result = await Student.find().populate('admissionSemester').populate({
+    path: 'academicDepartment',
+    populate: {
+      path: 'academicFaculty',
+    }
+  });
   return result;
 };
 const getSingleStudentFromDb = async (id: string) => {
-  const result = await StudentModel.findOne({ id });
+  const result = await Student.findById(id).populate('admissionSemester').populate({
+    path: 'academicDepartment',
+    populate: {
+      path: 'academicFaculty',
+    }
+  });
+  return result;
+};
+const deleteStudentFromDb = async (id: string) => {
+  const result = await Student.updateOne({ id }, { isDeleted: true });
   return result;
 };
 export const StudentServices = {
-  createStudentIntoDB,
   getAllStudentsFromDb,
   getSingleStudentFromDb,
+  deleteStudentFromDb
 };
